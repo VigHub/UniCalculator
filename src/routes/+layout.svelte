@@ -7,7 +7,6 @@
 	import { storePopup } from '@skeletonlabs/skeleton';
 	import { Modal } from '@skeletonlabs/skeleton';
 	import { initializeStores } from '@skeletonlabs/skeleton';
-
 	initializeStores();
 	storePopup.set({ computePosition, autoUpdate, flip, shift, offset, arrow });
 </script>

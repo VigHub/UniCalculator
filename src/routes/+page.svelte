@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { averageNeededForBase, getStartingPoint, getWeightedAverage } from '$lib';
 	import Table from '$lib/components/Table.svelte';
-	import type { Exam } from '$lib/interface';
 	import { exams } from '$lib/stores';
 	import { ProgressRadial } from '@skeletonlabs/skeleton';
 
