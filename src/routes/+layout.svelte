@@ -12,11 +12,14 @@
 </script>
 
 <Modal />
+<svelte:head>
+	<title>UNI Calculator</title>
+</svelte:head>
 
 <AppShell>
 	<svelte:fragment slot="header">
 		<AppBar>
-			<svelte:fragment slot="default">
+			<svelte:fragment slot="lead">
 				<strong class="text-xl uppercase">UNI Calculator</strong>
 			</svelte:fragment>
 			<svelte:fragment slot="trail"></svelte:fragment>
