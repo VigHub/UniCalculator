@@ -1,12 +1,12 @@
 export interface Exam {
-	name: string;
+	title: string;
 	cfu: number;
-	vote: number;
-	professor?: Professor;
-	doneAt?: Date;
+	id?: number
 }
 
-export interface Professor {
-	name: string;
-	surname: string;
+export interface Grade {
+	grade: number;
+	date?: string;
+	Exam: Exam;
+	id?: number;
 }

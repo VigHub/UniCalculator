@@ -1,5 +1,4 @@
 import { writable } from 'svelte/store';
-import type { Exam } from './interface';
+import type { Grade } from './interface';
 
-export const weightedAverage = writable(28.5);
-export const exams = writable<Exam[]>([]);
+export const examsStore = writable<Grade[]>([]);
