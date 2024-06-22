@@ -1,1 +1,1 @@
-export const env={}
+export const env={"PUBLIC_SUPABASE_KEY":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qeXJmZmhia2tybHBrdGpwZ29xIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MTkwNTE4OTYsImV4cCI6MjAzNDYyNzg5Nn0.313cidXbdzog0uhCqlshdL7c8h99o9WpnivVpOl7qR8"}
