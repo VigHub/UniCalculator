@@ -1,14 +1,19 @@
 <script lang="ts">
-	import type { Exam } from '$lib/interface';
+	import type { Exam, Grade } from '$lib/interface';
 	import type { ModalComponent, ModalSettings } from '@skeletonlabs/skeleton';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 	import AddEditExam from './AddEditExam.svelte';
-	import { exams } from '$lib/stores';
+	import { removeExam } from '$lib/db';
+	import { examsStore } from '$lib/stores';
 
 	const modalStore = getModalStore();
+	export let exams: Grade[];
 
-	const deleteExam = (name: string) => {
-		$exams = $exams.filter((exam) => exam.name !== name);
+	const deleteExam = async (examID?: number) => {
+		const deleted = await removeExam(examID);
+		if (deleted) {
+			$examsStore = $examsStore.filter((exam) => exam.Exam.id !== examID);
+		}
 	};
 
 	const onDeleteExamClicked = (exam: Exam) => {
@@ -16,13 +21,13 @@
 			type: 'confirm',
 			// Data
 			title: 'Conferma elimina esame',
-			body: `Vuoi davvero eliminare l'esame di <b>${exam.name}?</b>`,
+			body: `Vuoi davvero eliminare l'esame di <b>${exam.title}?</b>`,
 			buttonTextCancel: 'Annulla',
 			buttonTextConfirm: 'Elimina',
 			// TRUE if confirm pressed, FALSE if cancel pressed
-			response: (r: boolean) => {
+			response: async (r: boolean) => {
 				if (r) {
-					deleteExam(exam.name);
+					await deleteExam(exam.id);
 				}
 			}
 		};
@@ -39,10 +44,10 @@
 		};
 		modalStore.trigger(modal);
 	};
-	const onEditExamClicked = (exam: Exam, index: number) => {
+	const onEditExamClicked = (exam: Grade) => {
 		const modalComponent: ModalComponent = {
 			ref: AddEditExam,
-			props: { exam, index },
+			props: { exam },
 			slot: '<p>Skeleton</p>'
 		};
 		const modal: ModalSettings = {
@@ -75,25 +80,25 @@
 			</div>
 
 			<div>
-				{#each $exams as exam, index}
+				{#each exams as exam, index}
 					<div
 						class={'flex flex-row justify-center px-5 py-3 border border-y-gray-400 ' +
 							(index === 0 ? 'rounded-t-lg' : '') +
-							(index === $exams.length - 1 ? 'rounded-b-lg ' : '') +
+							(index === exams.length - 1 ? 'rounded-b-lg ' : '') +
 							(index % 2 === 0 ? ' bg-surface-100' : ' bg-surface-50')}
 					>
 						<div class="text-center text-wrap max-w-64 lg:max-w-full basis-1/3 my-auto">
 							<p class="">
-								{exam.name}
+								{exam.Exam.title}
 							</p>
 						</div>
 						<div class="basis-1/6 my-auto text-center ps-2">
-							<p class="text-wrap">{exam.cfu}</p>
+							<p class="text-wrap">{exam.Exam.cfu}</p>
 						</div>
-						<div class="basis-1/6 my-auto text-center"><p class="text-wrap">{exam.vote}</p></div>
+						<div class="basis-1/6 my-auto text-center"><p class="text-wrap">{exam.grade}</p></div>
 						<div class="basis-1/5 flex">
 							<div class="flex my-auto -space-x-3">
-								<button class="btn btn-sm h-full" on:click={() => onEditExamClicked(exam, index)}
+								<button class="btn btn-sm h-full" on:click={() => onEditExamClicked(exam)}
 									><svg
 										xmlns="http://www.w3.org/2000/svg"
 										fill="none"
@@ -109,7 +114,7 @@
 										/>
 									</svg>
 								</button>
-								<button class="btn btn-sm" on:click={() => onDeleteExamClicked(exam)}
+								<button class="btn btn-sm" on:click={() => onDeleteExamClicked(exam.Exam)}
 									><svg
 										xmlns="http://www.w3.org/2000/svg"
 										fill="none"

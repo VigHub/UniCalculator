@@ -1,47 +1,60 @@
 <script lang="ts">
-	import type { Exam } from '$lib/interface';
-	import { exams } from '$lib/stores';
+	import { insertExam, insertGrade, removeExam, updateExam, updateGradedExam } from '$lib/db';
+	import type { Grade } from '$lib/interface';
+	import { examsStore } from '$lib/stores';
 	import { getModalStore } from '@skeletonlabs/skeleton';
 
-	export let exam: Exam | undefined = undefined;
-	export let index: number | undefined = undefined;
-	let name: string;
-	let cfu: number;
-	let vote: number;
-	if (exam && index) {
-		name = exam.name;
-		cfu = exam.cfu;
-		vote = exam.vote;
+	export let exam: Grade;
+	let modifyExam = true;
+	if (exam === undefined) {
+		modifyExam = false;
+		exam = {
+			Exam: {
+				title: '',
+				cfu: 3
+			},
+			grade: 0
+		};
 	}
 
 	const modalStore = getModalStore();
 
-	const addExam = () => {
-		$exams = [...$exams, { name, cfu, vote }];
-		modalStore.close();
-	};
-
-	const editExam = () => {
-		if (name !== '') {
-			$exams = $exams.map((e, i) => {
-				if (index === i) {
-					return { name, cfu, vote };
-				}
-				return e;
-			});
-		}
-		modalStore.close();
-	};
-
-	const onClick = () => {
-		if (exam && index) {
-			editExam();
+	const addExam = async () => {
+		const examAdded = await insertExam(exam.Exam);
+		if (examAdded === null) return;
+		exam.Exam.id = examAdded.id;
+		const gradeAdded = await insertGrade(exam.grade, exam.Exam);
+		if (gradeAdded) {
+			$examsStore = [...$examsStore, exam];
+			modalStore.close();
 		} else {
-			addExam();
+			await removeExam(exam.Exam.id);
 		}
 	};
 
-	const buttonMessage = exam && index ? 'Modifica' : 'Aggiungi';
+	const editExam = async () => {
+		const gradeUpdated = await updateGradedExam(exam.grade, exam.id);
+		const examUpdated = await updateExam(exam.Exam, exam.Exam.id);
+		if (gradeUpdated && examUpdated) {
+			$examsStore = $examsStore.map((examIter) => {
+				if (examIter.id === exam.id) {
+					return exam;
+				}
+				return examIter;
+			});
+			modalStore.close();
+		}
+	};
+
+	const onClick = async () => {
+		if (modifyExam) {
+			await editExam();
+		} else {
+			await addExam();
+		}
+	};
+
+	const buttonMessage = modifyExam ? 'Modifica' : 'Aggiungi';
 </script>
 
 <div class="card p-4 w-modal shadow-xl" spellcheck="false">
@@ -54,7 +67,7 @@
 					name="name"
 					id="name"
 					placeholder="Nome esame"
-					bind:value={name}
+					bind:value={exam.Exam.title}
 					class="input input-primary"
 				/>
 			</div>
@@ -66,7 +79,7 @@
 						name="cfu"
 						id="cfu"
 						placeholder="CFU"
-						bind:value={cfu}
+						bind:value={exam.Exam.cfu}
 						class="input input-primary"
 						min="3"
 						max="12"
@@ -79,7 +92,7 @@
 						name="vote"
 						id="vote"
 						placeholder="Voto"
-						bind:value={vote}
+						bind:value={exam.grade}
 						class="input input-primary"
 						min="18"
 						max="30"
